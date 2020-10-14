@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <form action="" enctype="multipart/form-data" id="form1">
+
+        <input type="text" id="title">
+        <input type="textarea" id="article">
+        <label>select image: </label>
+        <input type="file" id="image" accept="image/"> <br> <br>
+        <input type="button"  onclick="upload()" id="post" value="post">
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="container">
+        hy
+    </div>
+    <div id="details" style="display: none;">
+        <h2 id="d"></h2>
+        <form action="" id="form2">
+            <input type="text" id="comment" value="your comment"><input type="submit" value="add">
+        </form>
+        <p id="c"></p>
+    </div>
+
+
+
+</body>
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-storage.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-analytics.js"></script>
+
+<script id="Mainscript">
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+        apiKey: "AIzaSyC3_cAKGOnuFOHuYNUikh7TH2HUst_09jI",
+        authDomain: "article-blog-93940.firebaseapp.com",
+        databaseURL: "https://article-blog-93940.firebaseio.com",
+        projectId: "article-blog-93940",
+        storageBucket: "article-blog-93940.appspot.com",
+        messagingSenderId: "331886057065",
+        appId: "1:331886057065:web:1f5457a3be95e587e7f4f8",
+        measurementId: "G-GNQ6GR0LCQ"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    // function uploadImage(){
+    //   const ref = firebase.storage().ref();
+    // const file = $('#photo').get(0).files[0];
+    //const name = (+new Date()) + '-' + file.name;
+    //        const metadata = { contentType: file.type };
+
+    //      const task = ref.child(name).put(file, metadata);
+    //    task
+    //  .then(snapshot => snapshot.ref.getDownloadURL())
+    //.then(url =>{
+    //  console.log(url)
+    //alert('image uploaded')
+    //          const image = document.querySelector('#image')
+    //        image.src =url
+    //  })
+
+    // }
+ //   function upload() {
+   //     var image = document.getElementById("image").files[0];
+     //   var imageName = (+new Date()) + '-' + image.name;
+       // var storageRef = firebase.storage().ref("images/" + imageName);
+        //var uploadTask = storageRef.put(image);
+        //uploadTask.on("state_changed", function (snapshot) {
+          //  var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            //console.log("uploaded" + progress + "done")
+        //},
+          //  function (error) {
+            //    console.log(error.message);
+
+            //}, function () {
+              //  uploadTask.snapshot.ref.getDownloadURL().then(function (d) {
+                //    console.log(d);
+                //})
+            //}
+        //);
+    //}
+
+   
+
+
+    var title, article, image_url;
+
+   
+    function Ready() {
+        title = document.getElementById('title').value;
+        article = document.getElementById('article').value;
+
+        var image = document.getElementById("image").files[0];
+        var imageName = image.name;
+        var storageRef = firebase.storage().ref("images/" + imageName);
+        var uploadTask = storageRef.put(image);
+        uploadTask.on("state_changed", function (snapshot) {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("uploaded" + progress + "done")
+        },
+            function (error) {
+                console.log(error.message);
+
+            }, 
+            
+             async function () {
+                uploadTask.snapshot.ref.getDownloadURL().then(function (url) {
+                    image_url = url;
+                    console.log(url);
+                    document.getElementById('imag').src = url;
+                    
+                    
+                })
+            }
+             
+        );
+        console.log(image_url);
+        
+        
+        
+    }
+
+    document.getElementById('post').onclick =  function () {
+        Ready();
+        firebase.database().ref('Table/' + title).set({
+            Title: title,
+            Article: article,
+            Image: image_url
+            
+
+
+        });
+
+    }
+
+    var database = firebase.database();
+    database.ref('Table/').once('value', function (snapshot) {
+        snapshot.forEach(function (data) {
+            var titl = data.val().Title;
+            var articl = data.val().Article;
+            var imag = data.val().Image;
+            
+            console.log(imag);
+            $("div.container").append("<div class= 'card'><img id='imag'><li id='artic'>" + titl + "</li><li>" + articl + "</li></div><br>");
+
+            $("li#artic").last().click(function () {
+                $("#details").show();
+                $("#details h2").text(titl);
+
+            });
+        });
+    });
+
+
+
+</script>
+<script src="js/index.js"></script>
+
+</html>
